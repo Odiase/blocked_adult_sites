@@ -4,6 +4,11 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.backends import default_backend
 
+def normalize_data(data: bytes) -> bytes:
+    """Ensure consistent line endings and no trailing spaces before signing/verifying"""
+    return data.replace(b"\r\n", b"\n").strip()
+
+
 def sign_blocklist():
     """Signs the blocklist.txt file using the private key."""
     try:
@@ -17,7 +22,7 @@ def sign_blocklist():
 
         # Load the content of your updated blocklist file
         with open("blocklist.txt", "rb") as f:
-            blocklist_content = f.read()
+            blocklist_content = normalize_data(f.read())
 
         # Create a digital signature for the new content
         signature = private_key.sign(
